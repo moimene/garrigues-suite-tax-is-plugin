@@ -1,0 +1,4 @@
+interface:
+  display_name: "Intake Expediente IS"
+  short_description: "Clasifica carpeta y prepara el motor"
+  default_prompt: "Use $descubrir-expediente to inspect this local expediente folder, classify its files, ask only the missing intake questions, and stop when it is ready to run the IS motor."

@@ -1,0 +1,29 @@
+{
+  "name": "garrigues-suite-fiscal",
+  "owner": {
+    "name": "Garrigues - Suite Fiscal Enterprise"
+  },
+  "metadata": {
+    "description": "Marketplace interno de la Suite Fiscal de Garrigues. Plugins de la campana del Impuesto sobre Sociedades y herramientas afines.",
+    "version": "1.18.1"
+  },
+  "plugins": [
+    {
+      "name": "suite-tax-is",
+      "source": "plugins/suite-tax-is",
+      "description": "Copiloto del Impuesto sobre Sociedades (Modelos 200/202/222): genera la base de importacion AEAT (DR200 + XML mod200) desde contabilidad o expediente por carpeta, sobre el motor fiscal Python canonico ADR-001. Release 1.18.1 con precarga N-1 formal completa.",
+      "version": "1.18.1",
+      "keywords": [
+        "impuesto-sociedades",
+        "modelo-200",
+        "modelo-202",
+        "modelo-222",
+        "aeat",
+        "dr200",
+        "garrigues",
+        "fiscal",
+        "suite-tax-is"
+      ]
+    }
+  ]
+}

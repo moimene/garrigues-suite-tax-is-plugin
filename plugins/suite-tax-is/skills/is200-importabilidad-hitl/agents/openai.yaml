@@ -1,0 +1,4 @@
+interface:
+  display_name: "IS200 Importabilidad HITL"
+  short_description: "Corrige .200 hasta importabilidad"
+  default_prompt: "Use $is200-importabilidad-hitl to diagnose a Modelo 200 .200 import file, apply only mechanical pre-import fixes, and defer fiscal HITL until after a positive Sociedades WEB import."
