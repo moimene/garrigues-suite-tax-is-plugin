@@ -8,6 +8,8 @@ __pycache__/
 *.xlsb
 *.docx
 *.zip
+!downloads/motor/win64/suite-tax-is-portable-win64-v*.zip
+!downloads/motor/win64/suite-tax-is-portable-win64-v*.zip.sha256
 NUEVA RONDA DECLARACIONES/
 EXPEDIENTES IS TOTALES/
 **/entrada/
