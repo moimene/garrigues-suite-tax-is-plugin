@@ -10,6 +10,10 @@ __pycache__/
 *.zip
 !downloads/motor/win64/suite-tax-is-portable-win64-v*.zip
 !downloads/motor/win64/suite-tax-is-portable-win64-v*.zip.sha256
+!downloads/motor/macos-arm64/suite-tax-is-portable-macos-arm64-v*.zip
+!downloads/motor/macos-arm64/suite-tax-is-portable-macos-arm64-v*.zip.sha256
+!downloads/motor/macos-x64/suite-tax-is-portable-macos-x64-v*.zip
+!downloads/motor/macos-x64/suite-tax-is-portable-macos-x64-v*.zip.sha256
 NUEVA RONDA DECLARACIONES/
 EXPEDIENTES IS TOTALES/
 **/entrada/

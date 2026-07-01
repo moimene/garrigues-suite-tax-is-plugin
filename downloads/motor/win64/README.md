@@ -27,7 +27,8 @@ dist\suite-tax-is-portable-win64-v1.18.1.zip
 dist\suite-tax-is-portable-win64-v1.18.1.zip.sha256
 ```
 
-Copia ambos ficheros a esta carpeta y publica un nuevo commit.
+Copia ambos ficheros a esta carpeta y publica un nuevo commit si el zip no supera el limite de GitHub para
+ficheros versionados. Si lo supera, publicalo como GitHub Release asset y deja aqui el checksum/enlace.
 
 ## Uso por el usuario
 
@@ -45,4 +46,4 @@ Copia ambos ficheros a esta carpeta y publica un nuevo commit.
 http://127.0.0.1:8000/salud
 ```
 
-El plugin Claude se instala aparte desde el marketplace del repo.
+El plugin se instala aparte desde el marketplace del repo.

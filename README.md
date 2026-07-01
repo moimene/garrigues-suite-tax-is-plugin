@@ -13,7 +13,9 @@ los calculos y debe estar disponible aparte.
 | `.claude-plugin/marketplace.json` | Marketplace para Claude/Cowork. |
 | `.agents/plugins/marketplace.json` | Marketplace para Codex. |
 | `plugins/suite-tax-is/` | Plugin thin comun: skills, comandos, agentes y manifiestos. |
-| `downloads/motor/win64/` | Descarga del motor portable Windows cuando este construido. |
+| `downloads/motor/win64/` | Descarga del motor portable Windows. |
+| `downloads/motor/macos-arm64/` | Descarga del motor portable macOS Apple Silicon. |
+| `downloads/motor/macos-x64/` | Descarga del motor portable macOS Intel. |
 | `VERSION_MATRIX.md` | Compatibilidad entre plugin y motor. |
 
 No debe contener expedientes reales, PDFs, Excels, `.200`, Manuales ni salidas con PII.
@@ -52,13 +54,24 @@ Opciones:
 - **Windows Enterprise:** servicio local gestionado por IT o `SUITE_IS_ENGINE_URL` interna.
 - **Portable Windows:** descargar el zip desde `downloads/motor/win64/`, descomprimir y ejecutar
   `scripts\start-suite-tax-is.ps1`.
+- **Portable macOS Apple Silicon:** descargar el zip desde `downloads/motor/macos-arm64/`, descomprimir y
+  ejecutar `scripts/start-suite-tax-is.sh`.
+- **Portable macOS Intel:** descargar el zip desde `downloads/motor/macos-x64/`, descomprimir y ejecutar
+  `scripts/start-suite-tax-is.sh`.
 
 Artefactos esperados para la release actual:
 
 ```text
 downloads/motor/win64/suite-tax-is-portable-win64-v1.18.1.zip
 downloads/motor/win64/suite-tax-is-portable-win64-v1.18.1.zip.sha256
+downloads/motor/macos-arm64/suite-tax-is-portable-macos-arm64-v1.18.1.zip
+downloads/motor/macos-arm64/suite-tax-is-portable-macos-arm64-v1.18.1.zip.sha256
+downloads/motor/macos-x64/suite-tax-is-portable-macos-x64-v1.18.1.zip
+downloads/motor/macos-x64/suite-tax-is-portable-macos-x64-v1.18.1.zip.sha256
 ```
+
+Regla de tamano: si un zip supera el limite de GitHub para ficheros versionados en git, se publica como
+GitHub Release asset y se deja aqui el enlace/checksum. No se fuerza un binario grande dentro del historial.
 
 ## Primer uso
 
@@ -74,7 +87,7 @@ OpenWeb sigue siendo el gate final de importabilidad.
 
 1. Publicar plugin y motor con la misma version funcional segun `VERSION_MATRIX.md`.
 2. Sustituir `plugins/suite-tax-is/` por el thin validado.
-3. Construir el portable Windows y copiar zip + `.sha256` a `downloads/motor/win64/`.
+3. Construir los portables Windows/macOS y copiar zip + `.sha256` a `downloads/motor/<plataforma>/`.
 4. Ejecutar guardrail anti-PII.
 5. Commit, tag y push.
 
