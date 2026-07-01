@@ -1,0 +1,44 @@
+{
+  "name": "suite-tax-is",
+  "version": "1.18.1",
+  "description": "Suite Tax IS para Codex: skills operativas del Impuesto sobre Sociedades sobre el motor fiscal Python canonico ADR-001. Release 1.18.1 con importabilidad OpenWeb consolidada y precarga N-1 formal completa.",
+  "author": {
+    "name": "Garrigues - Suite Fiscal Enterprise",
+    "url": "https://github.com/moimene/garrigues-suite-tax-is-plugin"
+  },
+  "homepage": "https://github.com/moimene/garrigues-suite-tax-is-plugin",
+  "repository": "https://github.com/moimene/garrigues-suite-tax-is-plugin",
+  "license": "UNLICENSED",
+  "keywords": [
+    "impuesto-sociedades",
+    "modelo-200",
+    "modelo-202",
+    "modelo-222",
+    "aeat",
+    "dr200",
+    "importacion-aeat",
+    "codex",
+    "garrigues",
+    "suite-tax-is"
+  ],
+  "skills": "./skills/",
+  "interface": {
+    "displayName": "Suite Tax IS",
+    "shortDescription": "Motor y skills para preparar Modelo 200.",
+    "longDescription": "Plugin Codex thin para operar Suite Tax IS: discovery de expedientes, exportacion AEAT, importabilidad, gestion de errores y control del motor fiscal Python canonico. El motor no viaja dentro del plugin; debe arrancarse aparte como servicio Windows, URL interna o portable local.",
+    "developerName": "Garrigues - Suite Fiscal Enterprise",
+    "category": "Tax",
+    "capabilities": [
+      "Read",
+      "Write",
+      "Interactive"
+    ],
+    "websiteURL": "https://github.com/moimene/garrigues-suite-tax-is-plugin",
+    "defaultPrompt": [
+      "Analiza este expediente de Sociedades.",
+      "Valida la importabilidad de este .200.",
+      "Arranca y comprueba el motor fiscal."
+    ],
+    "brandColor": "#B5121B"
+  }
+}

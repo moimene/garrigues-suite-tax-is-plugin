@@ -5,12 +5,16 @@ Repositorio privado para distribuir el plugin thin `suite-tax-is` en Claude/Cowo
 Este repo distribuye dos cosas separadas:
 
 - **Plugin Claude thin**: marketplace, skills, comandos, agentes y scripts ligeros.
+- **Plugin Codex thin**: manifiesto `.codex-plugin` y marketplace `.agents/plugins/marketplace.json` sobre
+  las mismas skills.
 - **Motor portable Windows**: zip descargable en `downloads/motor/win64/` cuando esté construido.
 
 ## Contenido
 
 - `plugins/suite-tax-is/`: plugin thin `1.18.1` con skills, comandos, agentes y scripts ligeros.
 - `.claude-plugin/marketplace.json`: marketplace interno `garrigues-suite-fiscal`.
+- `.agents/plugins/marketplace.json`: marketplace repo-local para Codex.
+- `plugins/suite-tax-is/.codex-plugin/plugin.json`: manifiesto Codex del plugin.
 - `VERSION_MATRIX.md`: compatibilidad entre plugin y motor.
 - `downloads/motor/win64/`: carpeta para publicar el zip portable del motor Windows.
 
@@ -18,10 +22,25 @@ No contiene Manual, expedientes reales, PDFs, Excels, ficheros `.200` ni salidas
 
 ## Instalacion por el equipo
 
+### Claude/Cowork
+
 ```text
 /plugin marketplace add https://github.com/moimene/garrigues-suite-tax-is-plugin
 /plugin install suite-tax-is@garrigues-suite-fiscal
 ```
+
+### Codex
+
+El mismo repo incluye distribucion Codex:
+
+```text
+.agents/plugins/marketplace.json
+plugins/suite-tax-is/.codex-plugin/plugin.json
+```
+
+En entornos Codex con soporte de marketplace/plugin, usa este repo como marketplace interno y selecciona
+`suite-tax-is`. Si el entorno no soporta instalacion desde marketplace remoto, clona el repo y apunta Codex
+al marketplace local `.agents/plugins/marketplace.json`.
 
 Para datos reales, el motor debe estar arrancado aparte como servicio Windows Enterprise, URL interna Garrigues
 o portable local Windows en `http://127.0.0.1:8000`.

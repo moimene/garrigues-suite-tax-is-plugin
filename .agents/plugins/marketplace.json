@@ -1,0 +1,20 @@
+{
+  "name": "garrigues-suite-fiscal",
+  "interface": {
+    "displayName": "Garrigues Suite Fiscal"
+  },
+  "plugins": [
+    {
+      "name": "suite-tax-is",
+      "source": {
+        "source": "local",
+        "path": "./plugins/suite-tax-is"
+      },
+      "policy": {
+        "installation": "AVAILABLE",
+        "authentication": "ON_INSTALL"
+      },
+      "category": "Tax"
+    }
+  ]
+}

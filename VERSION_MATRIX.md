@@ -2,10 +2,10 @@
 
 Esta matriz fija la compatibilidad operativa entre el plugin thin y el motor que firma el numero.
 
-| Plugin | Motor minimo | Fecha | Notas |
-| --- | --- | --- | --- |
-| 1.18.1 | 1.18.1 | 2026-07-01 | Precarga N-1 formal completa: administradores, B.1/B.2 con complementarias, titulares reales adicionales y `00027` no arrastrado. |
-| 1.18.0 | 1.18.0 | 2026-07-01 | Importabilidad consolidada: normal/abreviado/PYMES, ECPN, pagina 20 GF, proxy foral, SOCIMI y datos fiscales como intake HITL. |
+| Plugin | Superficie | Motor minimo | Fecha | Notas |
+| --- | --- | --- | --- | --- |
+| 1.18.1 | Claude + Codex | 1.18.1 | 2026-07-01 | Precarga N-1 formal completa: administradores, B.1/B.2 con complementarias, titulares reales adicionales y `00027` no arrastrado. |
+| 1.18.0 | Claude | 1.18.0 | 2026-07-01 | Importabilidad consolidada: normal/abreviado/PYMES, ECPN, pagina 20 GF, proxy foral, SOCIMI y datos fiscales como intake HITL. |
 
 ## Politica
 
