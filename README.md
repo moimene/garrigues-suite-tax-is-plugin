@@ -1,6 +1,6 @@
 # Suite Tax IS Plugin Marketplace
 
-Repositorio privado para distribuir el plugin thin `suite-tax-is` en Claude/Cowork.
+Repositorio para distribuir el plugin thin `suite-tax-is` en Claude/Cowork.
 
 Este repo distribuye dos cosas separadas:
 
