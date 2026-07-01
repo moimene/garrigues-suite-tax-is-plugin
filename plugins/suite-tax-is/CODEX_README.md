@@ -1,46 +1,33 @@
 # Suite Tax IS — Codex
 
-Distribucion Codex del plugin `suite-tax-is`.
-
-## Que instala
-
-- Skills Codex desde `skills/`.
-- Metadatos del plugin en `.codex-plugin/plugin.json`.
-- Entrada de marketplace repo-local en `.agents/plugins/marketplace.json`.
-
-No instala el motor fiscal Python. El motor `1.18.1` debe estar disponible aparte como servicio Windows,
-URL interna Garrigues o portable local.
+Guia corta para usar Suite Tax IS desde Codex.
 
 ## Instalacion
 
-Este repo puede usarse como marketplace/plugin local de Codex:
-
-```text
-https://github.com/moimene/garrigues-suite-tax-is-plugin
-```
-
-El marketplace Codex esta en:
+El repo contiene:
 
 ```text
 .agents/plugins/marketplace.json
-```
-
-El plugin Codex esta en:
-
-```text
 plugins/suite-tax-is/.codex-plugin/plugin.json
 ```
 
+Instala o apunta Codex al marketplace del repo y selecciona `suite-tax-is`.
+
 ## Motor
 
-Antes de ejecutar una declaracion, comprueba:
+Codex no instala el motor. Antes de trabajar:
 
 ```text
 http://127.0.0.1:8000/salud
 ```
 
-Para instalaciones no-enterprise, descarga el portable Windows desde:
+Si no responde, arranca el servicio Windows/portable o configura `SUITE_IS_ENGINE_URL`.
 
-```text
-downloads/motor/win64/
-```
+## Uso
+
+1. Abre una conversacion por declaracion o grupo.
+2. Da la ruta local del expediente.
+3. Usa `/is-nueva` para una sociedad o `/suite-is-export-aeat` para lote.
+4. Revisa el manifiesto y valida el `.200` en Sociedades WEB/OpenWeb.
+
+Los datos reales deben quedarse en local o infraestructura interna.

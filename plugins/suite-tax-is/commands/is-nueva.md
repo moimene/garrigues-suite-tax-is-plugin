@@ -1,5 +1,5 @@
 ---
-description: Arranca una nueva declaración del Impuesto sobre Sociedades (Modelo 200) en modo STEPPER contra la carpeta del expediente, sobre el motor local (ADR-001). Sin Harvey.
+description: Arranca una nueva declaración del Impuesto sobre Sociedades (Modelo 200) en modo stepper contra la carpeta del expediente, sobre el motor local (ADR-001).
 ---
 
 Arranca el **stepper del Impuesto sobre Sociedades** para UN expediente, contra su **carpeta**, consumiendo el

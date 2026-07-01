@@ -1,26 +1,24 @@
-# Suite Tax IS Plugin Marketplace
+# Suite Tax IS
 
-Repositorio para distribuir el plugin thin `suite-tax-is` en Claude/Cowork.
+Repositorio privado para instalar y actualizar Suite Tax IS en Claude/Cowork y Codex.
 
-Este repo distribuye dos cosas separadas:
+Suite Tax IS prepara la base de importacion del Impuesto sobre Sociedades: `.200` DR200 + XML mod200, usando
+un motor fiscal Python local o interno. El plugin aporta la guia operativa, skills y comandos; el motor firma
+los calculos y debe estar disponible aparte.
 
-- **Plugin Claude thin**: marketplace, skills, comandos, agentes y scripts ligeros.
-- **Plugin Codex thin**: manifiesto `.codex-plugin` y marketplace `.agents/plugins/marketplace.json` sobre
-  las mismas skills.
-- **Motor portable Windows**: zip descargable en `downloads/motor/win64/` cuando esté construido.
+## Que hay en este repo
 
-## Contenido
+| Ruta | Para que sirve |
+| --- | --- |
+| `.claude-plugin/marketplace.json` | Marketplace para Claude/Cowork. |
+| `.agents/plugins/marketplace.json` | Marketplace para Codex. |
+| `plugins/suite-tax-is/` | Plugin thin comun: skills, comandos, agentes y manifiestos. |
+| `downloads/motor/win64/` | Descarga del motor portable Windows cuando este construido. |
+| `VERSION_MATRIX.md` | Compatibilidad entre plugin y motor. |
 
-- `plugins/suite-tax-is/`: plugin thin `1.18.1` con skills, comandos, agentes y scripts ligeros.
-- `.claude-plugin/marketplace.json`: marketplace interno `garrigues-suite-fiscal`.
-- `.agents/plugins/marketplace.json`: marketplace repo-local para Codex.
-- `plugins/suite-tax-is/.codex-plugin/plugin.json`: manifiesto Codex del plugin.
-- `VERSION_MATRIX.md`: compatibilidad entre plugin y motor.
-- `downloads/motor/win64/`: carpeta para publicar el zip portable del motor Windows.
+No debe contener expedientes reales, PDFs, Excels, `.200`, Manuales ni salidas con PII.
 
-No contiene Manual, expedientes reales, PDFs, Excels, ficheros `.200` ni salidas con PII.
-
-## Instalacion por el equipo
+## Instalacion del plugin
 
 ### Claude/Cowork
 
@@ -31,55 +29,53 @@ No contiene Manual, expedientes reales, PDFs, Excels, ficheros `.200` ni salidas
 
 ### Codex
 
-El mismo repo incluye distribucion Codex:
+El repo incluye manifiesto Codex en:
 
 ```text
 .agents/plugins/marketplace.json
 plugins/suite-tax-is/.codex-plugin/plugin.json
 ```
 
-En entornos Codex con soporte de marketplace/plugin, usa este repo como marketplace interno y selecciona
-`suite-tax-is`. Si el entorno no soporta instalacion desde marketplace remoto, clona el repo y apunta Codex
-al marketplace local `.agents/plugins/marketplace.json`.
+En un entorno Codex con soporte de plugins/marketplaces, apunta al marketplace del repo y selecciona
+`suite-tax-is`. Si el entorno no permite marketplace remoto, clona el repo y usa el marketplace local.
 
-Para datos reales, el motor debe estar arrancado aparte como servicio Windows Enterprise, URL interna Garrigues
-o portable local Windows en `http://127.0.0.1:8000`.
+## Instalacion del motor
 
-## Descarga del motor portable
+El plugin no instala el motor. Antes de preparar declaraciones, el motor debe responder en:
 
-Cuando esté publicado:
+```text
+http://127.0.0.1:8000/salud
+```
+
+Opciones:
+
+- **Windows Enterprise:** servicio local gestionado por IT o `SUITE_IS_ENGINE_URL` interna.
+- **Portable Windows:** descargar el zip desde `downloads/motor/win64/`, descomprimir y ejecutar
+  `scripts\start-suite-tax-is.ps1`.
+
+Artefactos esperados para la release actual:
 
 ```text
 downloads/motor/win64/suite-tax-is-portable-win64-v1.18.1.zip
 downloads/motor/win64/suite-tax-is-portable-win64-v1.18.1.zip.sha256
 ```
 
-El usuario descarga el zip desde GitHub, lo descomprime en Windows y ejecuta:
+## Primer uso
 
-```powershell
-.\scripts\start-suite-tax-is.ps1
-```
+1. Instala el plugin.
+2. Arranca o valida el motor con `/suite-is-salud` o la skill `arrancar-motor`.
+3. Prepara una carpeta de expediente local con la informacion contable, el `.200` N-1 y anexos disponibles.
+4. Ejecuta `/is-nueva` para una sociedad o `/suite-is-export-aeat` para lote.
+5. Revisa el manifiesto de salida y valida el `.200` en Sociedades WEB/OpenWeb.
 
-El motor debe responder en:
+OpenWeb sigue siendo el gate final de importabilidad.
 
-```text
-http://127.0.0.1:8000/salud
-```
+## Actualizar una version
 
-## Actualizaciones
+1. Publicar plugin y motor con la misma version funcional segun `VERSION_MATRIX.md`.
+2. Sustituir `plugins/suite-tax-is/` por el thin validado.
+3. Construir el portable Windows y copiar zip + `.sha256` a `downloads/motor/win64/`.
+4. Ejecutar guardrail anti-PII.
+5. Commit, tag y push.
 
-1. En el monorepo del motor, cerrar tests y generar el thin con `bash build-plugin.sh entregables-piloto`.
-2. Sustituir `plugins/suite-tax-is/` por el contenido del `.plugin` thin validado.
-3. Actualizar `.claude-plugin/marketplace.json`, `plugins/suite-tax-is/.claude-plugin/plugin.json` y
-   `VERSION_MATRIX.md` a la misma release.
-4. En Windows, construir el portable con `build-portable-win64.ps1` desde el monorepo y copiar el zip +
-   `.sha256` a `downloads/motor/win64/`.
-5. Ejecutar el guardrail anti-PII antes de publicar.
-6. Commit, tag y push del repo privado.
-
-## Release actual
-
-- Plugin: `1.18.1`
-- Motor minimo: `1.18.1`
-- Cambio funcional: precarga N-1 formal completa de pagina 1/2, administradores, participadas B.1, socios B.2,
-  titulares reales y registros complementarios; `00027` no se arrastra por depender de 2025.
+Release actual: `1.18.1`.

@@ -6,8 +6,7 @@ description: >-
   Sociedades WEB) y el XML mod200 validado contra el XSD oficial. Úsala cuando el usuario quiera
   "picar/exportar la declaración", "generar la base de importación AEAT", "el DR200", "el XML del 200",
   correr un expediente por carpeta o procesar **muchas declaraciones en lote** para dejar de teclearlas a mano.
-  Consume el motor por servicio (`/exportar-aeat`, ADR-001); el número lo firma el motor (fail-closed). Si el
-  trabajo es operar Harvey (WF-1/WF-2) usa harvey-sociedades; para el cálculo/casillas, suite-is-motor.
+  Consume el motor por servicio (`/exportar-aeat`, ADR-001); el número lo firma el motor (fail-closed).
 metadata:
   version: "1.7.0"
 ---
@@ -77,8 +76,8 @@ La respuesta es JSON: `ok`, `validacion.valido_xsd`, `xsd_provisional`, `avisos`
 `casillas_dependientes_de_otros_modelos`, y `ficheros.{xml_mod200,declaracion_dr,...}.base64`. Decodifica
 el base64 de `xml_mod200` y `declaracion_dr` y escríbelos en una carpeta local.
 
-- **`liquidacion`** = JSON `{casilla: importe}` de la **liquidación firmada** del cierre (el bloque
-  `05_MAPPING_M200` de WF-2 / la consola). El contable + identificativos es **mecánico** (sale del SyS);
+- **`liquidacion`** = JSON `{casilla: importe}` de la **liquidación firmada** del cierre. El contable +
+  identificativos es **mecánico** (sale del SyS);
   la liquidación (BI/cuota) se añade por expediente desde el cierre. Sin ella, el `.200` sale solo con
   identificativos + contable (el `aviso` lo indica).
 
