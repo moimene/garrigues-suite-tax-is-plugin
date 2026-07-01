@@ -75,13 +75,22 @@ intake, no como dependencia obligatoria del motor congelado.
 
 - **Directa:** instala el fichero `suite-tax-is.plugin` o `suite-tax-is-thin-v1.18.1.plugin` desde Cowork
   (botón "Save plugin" del preview).
-- **Por marketplace interno:** añade el marketplace Garrigues (`marketplace-garrigues/`) y selecciona
-  el plugin `suite-tax-is` desde él.
+- **Por marketplace interno:** añade el marketplace Garrigues y selecciona el plugin `suite-tax-is` desde él:
+
+  ```text
+  /plugin marketplace add https://github.com/moimene/garrigues-suite-tax-is-plugin
+  /plugin install suite-tax-is@garrigues-suite-fiscal
+  ```
+
 - **Windows Enterprise:** antes de ejecutar `/is-nueva`, IT debe haber arrancado el motor local o configurado
   `SUITE_IS_ENGINE_URL`. El self-contained Linux/aarch64 no es el paquete operativo de Garrigues Windows.
 - **No-enterprise/autocontenido:** usar un bundle portable Windows separado
   (`suite-tax-is-portable-win64-v1.18.1.zip`, pendiente de build) con plugin thin + motor + runtime Python +
   scripts PowerShell. El `.plugin` sigue siendo thin; el motor portable corre en `127.0.0.1:8000`.
+
+El marketplace **no instala el motor**. Instala solo skills, comandos, agentes y scripts ligeros. El motor
+`1.18.1` debe estar disponible aparte como servicio Windows, URL interna o portable local antes de procesar
+datos reales.
 
 Consulta `VERSION_MATRIX.md` antes de instalar: el plugin thin y el motor Windows/portable deben ir alineados
 en la misma release funcional.

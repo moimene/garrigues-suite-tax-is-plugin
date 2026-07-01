@@ -2,6 +2,10 @@
 
 Repositorio privado para distribuir el plugin thin `suite-tax-is` en Claude/Cowork.
 
+Este repo **no instala el motor fiscal Python**. Solo distribuye el marketplace, skills, comandos, agentes y
+scripts ligeros. El motor `1.18.1` debe desplegarse aparte como servicio Windows Enterprise, URL interna
+Garrigues o portable local Windows.
+
 ## Contenido
 
 - `plugins/suite-tax-is/`: plugin thin `1.18.1` con skills, comandos, agentes y scripts ligeros.
@@ -13,12 +17,12 @@ No contiene motor Python, Manual, expedientes reales, PDFs, Excels, ficheros `.2
 ## Instalacion por el equipo
 
 ```text
-/plugin marketplace add https://github.com/<org>/suite-tax-is-plugin
+/plugin marketplace add https://github.com/moimene/garrigues-suite-tax-is-plugin
 /plugin install suite-tax-is@garrigues-suite-fiscal
 ```
 
-El plugin es thin. Para datos reales, el motor debe estar arrancado aparte como servicio Windows Enterprise,
-URL interna Garrigues o portable local Windows en `http://127.0.0.1:8000`.
+Para datos reales, el motor debe estar arrancado aparte como servicio Windows Enterprise, URL interna Garrigues
+o portable local Windows en `http://127.0.0.1:8000`.
 
 ## Actualizaciones
 
