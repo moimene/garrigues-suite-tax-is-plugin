@@ -12,6 +12,7 @@ Esta matriz fija la compatibilidad operativa entre el plugin thin y el motor que
 ## Politica
 
 - El plugin de Garrigues es **thin**: no contiene motor, Manual, expedientes, PDFs, Excels, `.200` ni salidas con PII.
-- El motor se distribuye aparte: servicio Windows Enterprise, URL interna Garrigues o bundle portable Windows.
+- El motor se distribuye aparte: servicio Windows Enterprise, URL interna Garrigues, bundle portable Windows/macOS o
+  `engine-slim` verificado para Cowork/Linux.
 - Antes de usar `/is-nueva`, comprueba que el motor instalado corresponde a la version funcional indicada para el plugin.
 - Desde `1.18.3`, las skills y scripts fallan cerrado si `/version` es inferior al minimo de esta matriz.

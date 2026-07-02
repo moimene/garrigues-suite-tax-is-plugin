@@ -6,7 +6,8 @@ Usa este prompt al abrir una conversacion nueva para preparar declaraciones con 
 Quiero que esta conversacion funcione como FABRICA DE DECLARACIONES Modelo 200 usando el plugin Suite Tax IS.
 
 Repositorio/motor local de referencia:
-/Users/moisesmenendez/Dropbox/DESARROLLO/is200transmittalAPP
+- Si trabajas en Codex/desarrollo: usa la ruta local del monorepo Suite Tax IS que te indique el usuario.
+- Si trabajas en Claude/Cowork con plugin instalado: usa el plugin y el motor local/interno ya configurado; no dependas de una ruta absoluta del mantenedor.
 
 Version minima obligatoria:
 - Plugin Suite Tax IS: 1.18.3

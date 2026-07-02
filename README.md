@@ -16,6 +16,7 @@ los calculos y debe estar disponible aparte.
 | `downloads/motor/win64/` | Descarga del motor portable Windows. |
 | `downloads/motor/macos-arm64/` | Descarga del motor portable macOS Apple Silicon. |
 | `downloads/motor/macos-x64/` | Descarga del motor portable macOS Intel. |
+| `downloads/motor/linux-aarch64/` | Motor slim para Cowork/Linux aarch64, con checksum y script de fetch. |
 | `VERSION_MATRIX.md` | Compatibilidad entre plugin y motor. |
 
 No debe contener expedientes reales, PDFs, Excels, `.200`, Manuales ni salidas con PII.
@@ -61,6 +62,7 @@ Opciones:
   ejecutar `scripts/start-suite-tax-is.sh`.
 - **Portable macOS Intel:** descargar el zip desde `downloads/motor/macos-x64/`, descomprimir y ejecutar
   `scripts/start-suite-tax-is.sh`.
+- **Cowork/Linux aarch64:** usar `downloads/motor/linux-aarch64/fetch_engine.sh` con el tarball slim y su SHA256.
 
 Artefactos esperados para la release actual:
 
@@ -71,10 +73,27 @@ downloads/motor/macos-arm64/suite-tax-is-portable-macos-arm64-v1.18.3.zip
 downloads/motor/macos-arm64/suite-tax-is-portable-macos-arm64-v1.18.3.zip.sha256
 downloads/motor/macos-x64/suite-tax-is-portable-macos-x64-v1.18.3.zip
 downloads/motor/macos-x64/suite-tax-is-portable-macos-x64-v1.18.3.zip.sha256
+downloads/motor/linux-aarch64/engine-slim-v1.18.3.tar.gz
+downloads/motor/linux-aarch64/engine-slim-v1.18.3.tar.gz.sha256
+downloads/motor/linux-aarch64/fetch_engine.sh
 ```
 
 Regla de tamano: si un zip supera el limite de GitHub para ficheros versionados en git, se publica como
 GitHub Release asset y se deja aqui el enlace/checksum. No se fuerza un binario grande dentro del historial.
+
+Verificacion recomendada tras descargar:
+
+```bash
+shasum -a 256 -c suite-tax-is-portable-<plataforma>-v1.18.3.zip.sha256
+```
+
+En Windows PowerShell:
+
+```powershell
+$hash = (Get-FileHash .\suite-tax-is-portable-win64-v1.18.3.zip -Algorithm SHA256).Hash.ToLower()
+$expected = (Get-Content .\suite-tax-is-portable-win64-v1.18.3.zip.sha256).Split(" ")[0].ToLower()
+if ($hash -ne $expected) { throw "SHA256 no coincide" }
+```
 
 ## Primer uso
 

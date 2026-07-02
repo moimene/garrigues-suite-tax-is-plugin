@@ -55,10 +55,21 @@ Opciones:
 
 - **Servicio Windows Enterprise:** gestionado por IT.
 - **URL interna:** variable `SUITE_IS_ENGINE_URL`.
-- **Portable Windows:** descargar de `downloads/motor/win64/`, descomprimir y ejecutar:
+- **Portable Windows/macOS:** descargar de `downloads/motor/<plataforma>/`, verificar el `.sha256`, descomprimir y
+  ejecutar el script de arranque.
+- **Cowork/Linux:** usar `downloads/motor/linux-aarch64/fetch_engine.sh` con el tarball slim verificado.
+
+Windows:
 
 ```powershell
 .\scripts\start-suite-tax-is.ps1
+```
+
+macOS:
+
+```bash
+chmod +x scripts/*.sh
+./scripts/start-suite-tax-is.sh
 ```
 
 No uses motores demo o cloud con datos reales.
