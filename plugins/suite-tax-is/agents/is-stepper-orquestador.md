@@ -78,8 +78,10 @@ aguas abajo (recomputo) → los regeneras.
 ## Doble-check y lote
 - **Doble-check del número:** skill `suite-is-motor` (cadena `00550→00547→00552→00562→…→00621`, tope BIN
   art.26/DA15ª, anclas GIP). Si el motor y tu preview difieren, manda el motor.
-- **Muchas declaraciones:** skill `suite-is-export-aeat` (`lote_export_aeat.py`) = una carpeta de SyS → `.200`+XML
-  + informe por sociedad; las excepciones (descuadre / casillas dependientes a cero) = trabajo humano.
+- **Muchas declaraciones:** el carril por defecto para grupos nuevos es **individual primero**. Procesa la sociedad
+  mas compleja/representativa con `/is-nueva`; si pasa OpenWeb o solo devuelve errores conocidos, usa
+  `suite-is-export-aeat` (`lote_export_aeat.py`) para el resto. Evita lote inicial con foralidad, SOCIMI,
+  B.1/B.2 relevante, ECPN sensible, perfil abreviado dudoso o anexos pesados. En lote, revisa cada manifiesto.
 
 ## Salida
 Un **resumen por paso** (estado, semáforo, qué falta), **de-identificado**. Marca "no verificado" lo que no

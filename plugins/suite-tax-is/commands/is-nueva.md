@@ -24,4 +24,7 @@ Pasos de arranque:
 **Guardarraíles:** el motor **firma** el número (no inventas casillas) · paras en los checkpoints · fail-close
 (no esquives un gate) · PII local (codename, carpeta gitignored) · push/PR y Supabase = humano.
 
-**Muchas declaraciones a la vez:** usa la skill `suite-is-export-aeat` (lote por carpeta de sociedades).
+**Muchas declaraciones a la vez:** no saltes directamente a lote salvo grupo homogeneo o patron ya probado.
+Primero procesa en individual la sociedad mas compleja/representativa del grupo; si pasa OpenWeb o solo devuelve
+errores conocidos, usa `suite-is-export-aeat` para el resto. En grupos con foralidad, SOCIMI, B.1/B.2 relevante,
+ECPN sensible, perfil abreviado dudoso o anexos pesados, mantén el carril individual.

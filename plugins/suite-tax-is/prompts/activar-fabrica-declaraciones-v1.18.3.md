@@ -26,7 +26,7 @@ Skills/comandos a usar antes de improvisar scripts manuales:
 - suite-tax-is:arrancar-motor para comprobar/arrancar motor.
 - descubrir-expediente para inventario e intake de carpeta.
 - /is-nueva para una declaracion individual.
-- suite-is-export-aeat para exportacion .200/XML o lote.
+- suite-is-export-aeat para exportacion .200/XML o lote, solo cuando proceda segun el criterio de carril.
 - is200-importabilidad-hitl para pre-vuelo e iteracion.
 - gestion-errores-is para clasificar errores OpenWeb.
 - suite-is-motor como referencia de endpoints/reglas consolidadas.
@@ -40,6 +40,15 @@ Modo de trabajo:
 5. PDF N-1/datos fiscales son fuentes auxiliares o fallback si no existe .200.
 6. El gate real es Sociedades WEB/OpenWeb; el validador interno es pre-vuelo.
 7. Cualquier regla nueva observada en OpenWeb se documenta como hallazgo para el hilo de motor.
+
+Criterio de carril:
+1. Por defecto, trabaja declaracion a declaracion.
+2. Para un grupo nuevo, empieza por la sociedad mas compleja o representativa en modo individual.
+3. Usa lote/grupo solo si:
+   - ya ha pasado OpenWeb al menos una sociedad compleja o representativa del grupo; o
+   - el grupo es claramente homogeneo en fuentes, perfil contable, regimen y estructura formal.
+4. No uses lote de entrada si hay foralidad, SOCIMI, B.1/B.2 relevante, muchos administradores/titulares, datos fiscales sensibles, ECPN complejo, modelo abreviado dudoso o anexos pesados.
+5. Si corres lote, revisa individualmente cada manifiesto y cada 00_IMPORTAR_OPENWEB_*.200 antes de OpenWeb.
 
 Proceso obligatorio por expediente:
 

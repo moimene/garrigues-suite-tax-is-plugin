@@ -12,7 +12,10 @@ sigue sus reglas duras (el motor firma el número; PII en local; `.200` provisio
    `curl -s http://127.0.0.1:8000/version` → debe dar `ok:true` y `version >= 1.18.3`. En Garrigues Windows
    Enterprise, si no responde o es antiguo, debe arrancarse/actualizarse el servicio Windows local o configurarse
    `SUITE_IS_ENGINE_URL`. No uses el cloud demo con datos reales.
-2. **Corre el lote** sobre la carpeta (un SyS por sociedad). Si el abogado tiene identificativos y/o la
+2. **Decide si procede lote.** Por defecto, usa `/is-nueva` declaracion a declaracion. Corre lote solo si el
+   grupo es homogeneo o si la sociedad mas compleja/representativa ya paso OpenWeb. No uses lote de entrada con
+   foralidad, SOCIMI, B.1/B.2 relevante, ECPN sensible, modelo abreviado dudoso o anexos pesados.
+3. **Corre el lote** sobre la carpeta (un SyS por sociedad). Si el abogado tiene identificativos y/o la
    liquidación firmada por sociedad, que aporte un `map.csv` (`--map`):
 
    ```bash
@@ -20,8 +23,9 @@ sigue sus reglas duras (el motor firma el número; PII en local; `.200` provisio
      --carpeta "$1" --ejercicio "${2:-2024}" --out "$1/_export_aeat_out"
    ```
 
-3. **Resume el `informe_lote.md`**: cuántas OK, cuántas con incidencia y la lista de **excepciones**
+4. **Resume el `informe_lote.md`**: cuántas OK, cuántas con incidencia y la lista de **excepciones**
    (SyS a revisar + casillas que dependen de otros modelos a cero). El resto queda listo para importar en
-   Sociedades WEB. Recuerda: el `.200` es **provisional** hasta validarlo con una importación real.
+   Sociedades WEB, pero revisa individualmente cada manifiesto y cada `00_IMPORTAR_OPENWEB_*.200`. Recuerda:
+   el `.200` es **provisional** hasta validarlo con una importación real.
 
 No subas la carpeta de salida al repo (contiene PII). Los nombres usan codename, no el NIF.

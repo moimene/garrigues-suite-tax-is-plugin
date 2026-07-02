@@ -83,6 +83,16 @@ el base64 de `xml_mod200` y `declaracion_dr` y escríbelos en una carpeta local.
   identificativos + contable (el `aviso` lo indica).
 
 ## Muchas declaraciones (lote = carpeta de sociedades) — la palanca de escala
+El lote es una palanca de escala, no el carril por defecto para casos nuevos. Recomendacion operativa:
+
+- procesa **declaracion a declaracion** si el caso tiene foralidad, SOCIMI, B.1/B.2 relevante, muchos
+  administradores/titulares, datos fiscales sensibles, ECPN complejo, perfil abreviado/PYMES dudoso o anexos
+  pesados;
+- para un grupo nuevo, empieza por la sociedad mas compleja o representativa en individual;
+- usa lote cuando el grupo sea homogeneo o cuando una sociedad representativa ya haya pasado OpenWeb;
+- incluso en lote, revisa individualmente cada `manifiesto.md`, informe de importabilidad y
+  `00_IMPORTAR_OPENWEB_*.200` antes de subir.
+
 Una carpeta con **un SyS por sociedad** → un `.200` + un XML por sociedad + un informe de excepciones:
 
 ```bash
