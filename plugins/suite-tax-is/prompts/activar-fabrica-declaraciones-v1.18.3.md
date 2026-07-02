@@ -73,6 +73,11 @@ Proceso obligatorio por expediente:
    - No lo dejes como punto abierto ni lo sustituyas por normal por defecto salvo que falte en N-1 o el usuario declare expresamente un cambio.
    - Si el N-1 declara abreviado/PYMES, la apertura N-1 del ECPN no bloquea por defecto porque el ECPN es voluntario y se omite limpio.
 
+   Regla dura sobre fuente contable .xlsb:
+   - Un SyS/TB en .xlsb puede ser fuente contable probable, pero no es motor-ready.
+   - Si solo hay .xlsb, pide conversion/exportacion trazable a .xlsx o .csv antes de correr el motor.
+   - No confundas este bloqueo fisico con el modelo de cuentas: normal/abreviado/pymes se arrastra del .200 N-1 si existe.
+
    Regla dura: no cortar arrays silenciosamente. Si hay mas registros de los soportados o el parser no captura todo, marca incompleto=true y pide HITL.
 
 3. Datos fiscales y anexos:

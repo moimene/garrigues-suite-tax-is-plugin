@@ -70,6 +70,8 @@ Protocolo del primer paso:
 
 ## Qué clasifica
 - **Sumas y Saldos** (REQUERIDO).
+- **Sumas y Saldos en `.xlsb`**: se detecta como fuente contable probable, pero **no es entrada directa del
+  motor**; hay que convertirlo/exportarlo a `.xlsx` o `.csv` antes de correr.
 - **`.200` del año anterior** o **Modelo 200 / justificante N-1 PDF**.
 - **Datos fiscales AEAT 2025** PDF/digital: no solo presencia del fichero; hay que extraer y clasificar su
   contenido fiscal útil.
@@ -83,7 +85,10 @@ Protocolo del primer paso:
 
 ## Criterio de listo
 
-- `bloqueado`: falta Sumas y Saldos.
+- `bloqueado`: falta Sumas y Saldos en formato motor-ready (`.xlsx`, `.xls` o `.csv`).
+- `bloqueado`: solo hay un posible SyS en `.xlsb`; pedir conversión trazable a `.xlsx`/`.csv`. Esto **no**
+  reabre el modelo de cuentas: si existe `.200` N-1, el perfil normal/abreviado/PYMES se arrastra desde
+  `DP200001B`.
 - `bloqueado`: el SyS existe pero no es semánticamente usable, por ejemplo `Saldo Inicial` ausente o todo a cero.
 - `mínimo`: hay Sumas y Saldos; se puede correr el motor, pero habrá huecos que pedir o diferir.
 - `completo`: hay Sumas y Saldos + datos fiscales + fuente N-1 + CCAA. La liquidación/GIS puede existir, pero no
@@ -186,6 +191,7 @@ El mapeo PN→ECPN por columnas y por año está en `ccaa-a-sys-a3/references/ec
 ## Reglas
 - **Determinista:** clasifica por extensión + nombre + un *sniff* ligero de cabecera; **no** manda PDFs al LLM
   (ahorro de tokens — el esfuerzo lo hace el parser).
-- **Requerido = Sumas y Saldos**; lo demás mejora la precarga. Si falta, pídelo (vale en formato **ES o EN**).
+- **Requerido = Sumas y Saldos motor-ready** (`.xlsx`, `.xls` o `.csv`); lo demás mejora la precarga. Si solo hay
+  `.xlsb`, pide exportarlo/convertirlo manteniendo trazabilidad (vale en formato **ES o EN**).
 - **Iterar con el usuario:** no inventes si hay ambigüedad. Pregunta por la fuente correcta y vuelve a inventariar.
 - **PII local:** nombres de fichero locales; en el chat, **codename**. Datos reales solo en la carpeta.

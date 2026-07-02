@@ -4,6 +4,7 @@ Sociedades dentro de una carpeta local. DETERMINISTA: el parser hace el trabajo 
 disparar tokens leyendo PDFs. Asigna a cada fichero su PAPEL (sys / prev200 / modelo200_pdf /
 datos_fiscales / liquidacion / ccaa / salida / otro), detecta el formato del Sumas y Saldos (cabecera
 ES/EN, multipestaña) y devuelve un manifiesto de intake para iterar con el usuario antes de correr el motor.
+Detecta .xlsb como posible SyS, pero lo deja fuera del carril directo: requiere conversion trazable a .xlsx/.csv.
 
 Uso:  python3 inventario_carpeta.py "<ruta-de-la-carpeta>"
 PII:  los nombres de fichero son locales; en el chat resume en CODENAME, sin NIF/importes.
@@ -11,6 +12,8 @@ PII:  los nombres de fichero son locales; en el chat resume en CODENAME, sin NIF
 import sys, os, json, glob, re, unicodedata
 
 SYS_EXT = (".xlsx", ".xls", ".csv")
+SYS_BIN_EXT = (".xlsb",)
+SYS_NAME_KW = ("sumas", "saldo", "balance", "sys", "trial", "tb")
 
 
 def _norm_text(s):
@@ -128,6 +131,7 @@ def scan(folder):
         "datos_fiscales": [],
         "liquidacion": [],
         "ccaa": [],
+        "sys_convertir": [],
         "salida": [os.path.basename(p) for p in salida_files],
         "otro": [],
     }
@@ -139,9 +143,12 @@ def scan(folder):
         if ext == ".200" or _sniff_200(p):
             roles["prev200"].append(b)
             paths["prev200"].append(_rel(folder, p))
-        elif ext in SYS_EXT and _kw(b, "sumas", "saldo", "balance", "sys", "trial"):
+        elif ext in SYS_EXT and _kw(b, *SYS_NAME_KW):
             roles["sys"].append(b)
             paths["sys"].append(_rel(folder, p))
+        elif ext in SYS_BIN_EXT and _kw(b, *SYS_NAME_KW):
+            roles["sys_convertir"].append(b)
+            paths["sys_convertir"].append(_rel(folder, p))
         elif ext in SYS_EXT and _kw(b, "gis", "liquidacion", "liquidación", "estimacion", "estimación"):
             roles["liquidacion"].append(b)
             paths["liquidacion"].append(_rel(folder, p))
@@ -158,6 +165,9 @@ def scan(folder):
             paths["ccaa"].append(_rel(folder, p))
         elif ext in SYS_EXT:
             roles["otro"].append(b + "  (Excel/CSV — ¿contabilidad?)")
+            paths["otro"].append(_rel(folder, p))
+        elif ext in SYS_BIN_EXT:
+            roles["otro"].append(b + "  (Excel binario .xlsb — no legible directamente por el motor)")
             paths["otro"].append(_rel(folder, p))
         else:
             roles["otro"].append(b)
@@ -183,6 +193,13 @@ def scan(folder):
     bloqueos_semanticos = []
     if len(roles["sys"]) > 1:
         preguntas.append("Hay varios posibles SyS. Confirma cuál debe usar el motor.")
+    if not roles["sys"] and roles["sys_convertir"]:
+        bloqueos_semanticos.append(
+            "Hay un posible Sumas y Saldos en .xlsb, pero este formato no es entrada directa del motor en el "
+            "entorno actual. Exporta/convierte ese libro a .xlsx o .csv, o aporta una conversión trazable. "
+            "Esto solo bloquea la fuente contable: el modelo de cuentas de la declaración debe seguir "
+            "arrastrándose del .200 N-1 si existe."
+        )
     # APERTURA del ECPN: el SyS debe traer saldo de apertura (N-1). Si no, el ECPN sale con apertura 0 y la AEAT
     # lo recalcula y rechaza (E25400632/E25400645). PERO el motor sabe DERIVAR la apertura de la columna N-1 del
     # Balance de la CCAA (engines.extraer_texto_ccaa → ecpn_sys.proyectar_desde_balance). Por eso: si hay CCAA, es
@@ -228,6 +245,7 @@ def scan(folder):
             "datos_fiscales": paths["datos_fiscales"][0] if paths["datos_fiscales"] else None,
             "ccaa": paths["ccaa"][0] if paths["ccaa"] else None,
             "liquidacion": paths["liquidacion"][0] if paths["liquidacion"] else None,
+            "sys_convertir": paths["sys_convertir"][0] if paths["sys_convertir"] else None,
         },
         "listo_para_motor": not faltan and not bloqueos_semanticos,
         "calidad_intake": calidad,
@@ -246,12 +264,14 @@ def main():
     if not os.path.isdir(folder):
         sys.exit(f"ERROR: no existe la carpeta {folder}")
     roles, sysinfo, notes, faltan, reco, preguntas, manifest = scan(folder)
-    LB = {"sys": "Sumas y Saldos (REQUERIDO)", "prev200": ".200 año anterior",
+    LB = {"sys": "Sumas y Saldos (REQUERIDO)",
+          "sys_convertir": "SyS binario (.xlsb — requiere conversión)",
+          "prev200": ".200 año anterior",
           "modelo200_pdf": "Modelo 200 / justificante N-1 (PDF)",
           "datos_fiscales": "Datos fiscales (PDF)", "liquidacion": "GIS / liquidación (Excel)",
           "ccaa": "Cuentas anuales (PDF/DOCX)", "salida": "Salidas previas", "otro": "Otros (revisar)"}
     print(f"INVENTARIO — {folder}")
-    for r in ("sys", "prev200", "modelo200_pdf", "datos_fiscales", "liquidacion", "ccaa", "salida", "otro"):
+    for r in ("sys", "sys_convertir", "prev200", "modelo200_pdf", "datos_fiscales", "liquidacion", "ccaa", "salida", "otro"):
         if roles[r]:
             print(f"  • {LB[r]}: " + " · ".join(roles[r]))
     if sysinfo and sysinfo.get("idioma"):
