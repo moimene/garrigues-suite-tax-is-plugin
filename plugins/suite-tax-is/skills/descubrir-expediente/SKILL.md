@@ -103,7 +103,7 @@ PDF best-effort) y **presenta al abogado un checklist por bloque** (captado / va
 |---|---|---|---|
 | Identificativos (NIF, denominación, domicilio) | N-1 + datos fiscales | DP200001 (pág 1) | **bloquea**: sin denominación/NIF el `.200` sale en blanco |
 | Caracteres de configuración pág 1 (tipo entidad/régimen) | N-1 (marcas `X NNNNN`) | DP200001 (cubo 3) | arrastra del N-1 + **confírmalos**; excepción: `00027` base negativa/cero no se arrastra porque depende del resultado 2025 |
-| Modelo de cuentas / pág 1B | N-1 + CCAA | DP200001B | aviso; el abogado elige modelo de cuentas |
+| Modelo de cuentas / pág 1B | `.200` N-1 determinista; PDF/CCAA como fallback | DP200001B | si viene de `.200` N-1, **se arrastra por continuidad** y no queda como punto abierto salvo que el abogado declare cambio. Si solo viene de PDF/CCAA o falta, confirmar |
 | **Grupo fiscal** (si 00009/00010) — nº de grupo + NIF dominante | N-1 (pág 1: «Número de grupo fiscal» + «NIF de la entidad representante/dominante») | DP200001B campos 6 y 7 | **bloquea el miembro**: sin 00040 y NIF dominante, Open rechaza (10031, «00040 sin contenido»). Dependiente: campo 7 = NIF de la dominante (no el suyo) |
 | Administradores | N-1 | DP200002 campos 6-35 (hasta 5 slots) | aviso + pide |
 | **B.1 — sociedades en las que participa** | N-1 (bloque «Participaciones de la declarante») | `.200` solo si es bloque simple (≤3 participadas completas, sin continuación). Si es complejo, **post-import/HITL** en `b1_participadas_post_import.json` | aviso + pide; tras import positivo, completar/revisar en Sociedades WEB si queda fuera |

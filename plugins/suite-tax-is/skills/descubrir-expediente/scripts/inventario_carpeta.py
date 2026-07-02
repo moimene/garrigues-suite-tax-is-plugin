@@ -152,8 +152,8 @@ def scan(folder):
         elif ext == ".pdf" and _kw(b, "modelo 200", "modelo200", "justificante", "autoliquid", "declaracion"):
             roles["modelo200_pdf"].append(b)
             paths["modelo200_pdf"].append(_rel(folder, p))
-        elif ext == ".pdf" and _kw(b, "cuentas anuales", "ccaa", "cuentas_anuales", "memoria",
-                                   "annual accounts", "fy25 accounts"):
+        elif ext in (".pdf", ".docx") and _kw(b, "cuentas anuales", "ccaa", "cuentas_anuales", "memoria",
+                                               "annual accounts", "fy25 accounts", "financial statements"):
             roles["ccaa"].append(b)
             paths["ccaa"].append(_rel(folder, p))
         elif ext in SYS_EXT:
@@ -249,7 +249,7 @@ def main():
     LB = {"sys": "Sumas y Saldos (REQUERIDO)", "prev200": ".200 año anterior",
           "modelo200_pdf": "Modelo 200 / justificante N-1 (PDF)",
           "datos_fiscales": "Datos fiscales (PDF)", "liquidacion": "GIS / liquidación (Excel)",
-          "ccaa": "Cuentas anuales (PDF)", "salida": "Salidas previas", "otro": "Otros (revisar)"}
+          "ccaa": "Cuentas anuales (PDF/DOCX)", "salida": "Salidas previas", "otro": "Otros (revisar)"}
     print(f"INVENTARIO — {folder}")
     for r in ("sys", "prev200", "modelo200_pdf", "datos_fiscales", "liquidacion", "ccaa", "salida", "otro"):
         if roles[r]:

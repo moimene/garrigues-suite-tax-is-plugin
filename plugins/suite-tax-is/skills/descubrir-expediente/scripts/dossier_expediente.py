@@ -124,15 +124,17 @@ def construir_dossier(folder, ejercicio="2025"):
                       "dominante»). Apórtalos para que la declaración del miembro importe."), critico=True, confirmar=True)
 
     # 4. Modelo de estados de cuentas (pág 1B) — del N-1 (la continuidad año a año es la norma: cambiar de modelo
-    #    es excepcional). Si el N-1 lo trae, se PROPONE por continuidad (el abogado confirma); si no, se pregunta.
+    #    es excepcional). Si viene de `.200` N-1, queda CERRADO por continuidad y no se plantea como hueco; si viene
+    #    de PDF best-effort se muestra para confirmación. Si no consta, se pregunta.
     _me = (prec.get("modelo_estados") or {}) if prec else {}
     if _me:
         _txt = (f"N-1: Balance {_me.get('balance', '?')} · ECPN {_me.get('ecpn', '?')} · PyG {_me.get('pyg', '?')}"
-                " — propuesto por continuidad")
+                " — ARRASTRADO por continuidad")
         _no_normal = any(v in ("abreviado", "pymes") for v in _me.values())
         if _no_normal:
             _txt += " · el motor emite abreviado/PYMES (opt-in, certificado en Open); en esos modelos el ECPN es VOLUNTARIO"
-        add("Modelo de estados de cuentas (pág 1B)", True, _txt, fuente_n1 or "N-1", confirmar=True)
+        add("Modelo de estados de cuentas (pág 1B)", True, _txt, fuente_n1 or "N-1",
+            confirmar=("best-effort" in (fuente_n1 or "").lower()))
     else:
         add("Modelo de estados de cuentas (pág 1B)", False,
             "no consta en el N-1; el motor presenta NORMAL por defecto; confírmalo (normal/abreviado/PYMES)",

@@ -68,6 +68,11 @@ Proceso obligatorio por expediente:
    - ECPN/patrimonio N-1;
    - cualquier bloque repetible o de continuacion.
 
+   Regla dura sobre formato/modelo de cuentas:
+   - Si existe .200 N-1 y contiene DP200001B, arrastra el modelo de estados de cuentas de N-1 (normal/abreviado/pymes para Balance/ECPN/PyG) como configuracion de continuidad.
+   - No lo dejes como punto abierto ni lo sustituyas por normal por defecto salvo que falte en N-1 o el usuario declare expresamente un cambio.
+   - Si el N-1 declara abreviado/PYMES, la apertura N-1 del ECPN no bloquea por defecto porque el ECPN es voluntario y se omite limpio.
+
    Regla dura: no cortar arrays silenciosamente. Si hay mas registros de los soportados o el parser no captura todo, marca incompleto=true y pide HITL.
 
 3. Datos fiscales y anexos:
