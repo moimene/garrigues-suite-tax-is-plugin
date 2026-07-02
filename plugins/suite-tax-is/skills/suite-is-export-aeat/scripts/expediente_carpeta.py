@@ -15,13 +15,15 @@ Uso:
   # opcional: identificativos + liquidacion FIRMADA del cierre (JSON {casilla: importe}):
   python3 expediente_carpeta.py --carpeta ./exp --codename ACME --nif <NIF> --razon "<RAZON>" --liquidacion cierre.json
 """
-import argparse, base64, json, os, sys, glob, uuid, mimetypes, urllib.request, urllib.error
+import argparse, base64, json, os, sys, glob, uuid, mimetypes, re, urllib.request, urllib.error, unicodedata
 from datetime import datetime, timezone
 
 EXTS_SYS = (".xls", ".xlsx", ".csv")
 PREV_200 = (".200",)
 PREV_PDF = (".pdf",)
+PREV_TEXT = (".txt", ".md")
 CCAA_EXTS = (".pdf", ".docx")
+MIN_ENGINE_VERSION = os.environ.get("SUITE_IS_MIN_ENGINE_VERSION", "1.18.3")
 
 
 def parse_balance_pyg_agregado(path):
@@ -67,8 +69,32 @@ def salud(engine):
         return False
 
 
+def _version_tuple(value):
+    parts = [int(x) for x in re.findall(r"\d+", str(value or ""))[:3]]
+    return tuple((parts + [0, 0, 0])[:3])
+
+
+def comprobar_motor(engine):
+    base = engine.rstrip("/")
+    try:
+        estado = _req(base + "/salud", timeout=15)
+        info = _req(base + "/version", timeout=15)
+    except Exception as exc:
+        return False, f"no responde: {type(exc).__name__}: {exc}"
+    if estado.get("ok") is not True:
+        return False, f"/salud no OK: {estado}"
+    actual = str(info.get("version") or "")
+    if _version_tuple(actual) < _version_tuple(MIN_ENGINE_VERSION):
+        return False, f"version antigua {actual or '?'}; requiere >= {MIN_ENGINE_VERSION}"
+    return True, f"version {actual}"
+
+
 def now_iso():
     return datetime.now(timezone.utc).isoformat()
+
+
+def lname(path):
+    return unicodedata.normalize("NFC", os.path.basename(path)).lower()
 
 
 def find(folder, exts, exclude_dirs=("salida",)):
@@ -82,9 +108,53 @@ def find(folder, exts, exclude_dirs=("salida",)):
     return out
 
 
+def _merge_extra(a, b):
+    aa = list(a or [])
+    bb = list(b or [])
+    n = max(len(aa), len(bb))
+    out = []
+    for i in range(n):
+        av = aa[i] if i < len(aa) else None
+        bv = bb[i] if i < len(bb) else None
+        out.append(av if str(av or "").strip() else bv)
+    return out
+
+
+def _merge_item(a, b):
+    out = dict(a or {})
+    for k, v in (b or {}).items():
+        if k == "extra":
+            merged = _merge_extra(out.get("extra"), v)
+            if any(str(x or "").strip() for x in merged):
+                out["extra"] = merged
+            continue
+        if not str(out.get(k) or "").strip() and str(v or "").strip():
+            out[k] = v
+    return out
+
+
+def _merge_formal_list(cur, inc):
+    if not isinstance(cur, list) or not isinstance(inc, list):
+        return inc or cur
+    out = [dict(x) for x in cur]
+    pos = {str(x.get("nif") or "").strip(): i for i, x in enumerate(out) if str(x.get("nif") or "").strip()}
+    for item in inc:
+        nif = str((item or {}).get("nif") or "").strip()
+        if nif and nif in pos:
+            out[pos[nif]] = _merge_item(out[pos[nif]], item)
+        else:
+            out.append(dict(item or {}))
+            if nif:
+                pos[nif] = len(out) - 1
+    return out
+
+
 def merge_precarga(engine, files, ejercicio):
-    """Precarga N-1: corre /precarga-anterior por cada candidato y fusiona (A>B>C para formales;
-    identificativos de quien los traiga; caracteres/pagina01b del .200 previo)."""
+    """Precarga N-1/datos fiscales: corre /precarga-anterior por cada candidato y fusiona.
+
+    Caracteres/pagina01b se rellenan fill-if-missing; para formales se fusiona por NIF para conservar campos
+    completos del `.200` N-1 y añadir filas nuevas de datos fiscales 2025.
+    """
     car, p1b, formales, ident = {}, {}, {}, {}
     fuentes, necesita_ocr = [], False
     for f in files:
@@ -101,7 +171,12 @@ def merge_precarga(engine, files, ejercicio):
         for k, v in (r.get("pagina01b") or {}).items():
             p1b.setdefault(str(k), v)
         for k, v in (r.get("formales") or {}).items():
-            if v and not formales.get(k):
+            if not v:
+                continue
+            cur = formales.get(k)
+            if isinstance(v, list) and isinstance(cur, list):
+                formales[k] = _merge_formal_list(cur, v)
+            elif not cur:
                 formales[k] = v
         idt = r.get("identificativos") or {}
         for k in ("nif", "razon_social"):
@@ -128,6 +203,12 @@ def escribir_manifiesto(path, res, codename, ejercicio):
          "| Identificativos + caracteres + formales | precargado / requiere confirmacion | del N-1; el abogado confirma |",
          "| Liquidacion (BI/cuota) | firmada (si hay cierre) / cosmetica (borrador) | el motor firma; el abogado valida criterio GF |",
          "| Pendiente AEAT (otros modelos) | no incluido | se completa desde su modelo origen |", ""]
+    if fich.get("b1_post_import_json"):
+        L += ["## B.1 post-import",
+              "- Las sociedades participadas B.1 complejas no se han emitido dentro del `.200` importable.",
+              "- OpenWeb 2025 puede rechazar B.1 con continuaciones o totales `01501/01502/01503` frágiles; completar/revisar en Sociedades WEB tras import positivo.",
+              "- Datos preparados en `b1_participadas_post_import.json`.",
+              ""]
     if dep:
         pend = [d for d in dep if not d.get("presente")]
         L += [f"## Pendiente AEAT — {len(pend)} casilla(s) que dependen de otros modelos (a cero)",
@@ -171,9 +252,10 @@ def main():
     if "127.0.0.1" not in args.engine and "localhost" not in args.engine:
         print("AVISO: engine no-local. Con datos reales usa solo una URL interna Garrigues autorizada; "
               "el cloud demo es para datos sinteticos.", file=sys.stderr)
-    if not salud(args.engine):
-        sys.exit(f"ERROR: el engine no responde en {args.engine}/salud. Arranca el servicio Windows local "
-                 "o configura SUITE_IS_ENGINE_URL.")
+    motor_ok, motor_msg = comprobar_motor(args.engine)
+    if not motor_ok:
+        sys.exit(f"ERROR: motor no valido en {args.engine}: {motor_msg}. Arranca/actualiza el servicio Windows "
+                 "local, configura SUITE_IS_ENGINE_URL o usa el portable correcto.")
 
     estado.update({"pasoActual": max(int(estado.get("pasoActual", 0)), 0), "alcanceTrabajo": estado.get("alcanceTrabajo", "asistida"),
                    "actualizado": now_iso(), "codename": codename, "ejercicio": ej})
@@ -216,7 +298,14 @@ def main():
     estado["contabilidadCargada"] = bool(canonico or contable_casillas)
 
     # Paso 0/2 — Precarga N-1 (caracteres/pagina01b/formales/identificativos)
-    prev = find(src_dir, PREV_200) + find(src_dir, PREV_PDF)
+    _precarga_doc_exts = PREV_PDF + PREV_TEXT
+    _prev_pdf = [f for f in find(src_dir, _precarga_doc_exts)
+                 if any(k in lname(f) for k in (
+                     "datos fiscales", "datos_fiscales", "informacion fiscal", "información fiscal",
+                     "modelo 200", "modelo200", "justificante", "declaracion", "declaración"))
+                 and not any(k in lname(f) for k in (
+                     "cuentas", "annual", "ccaa", "eeff"))]
+    prev = find(src_dir, PREV_200) + _prev_pdf
     pre = merge_precarga(args.engine, prev, ej) if prev else {"caracteres": {}, "pagina01b": {}, "formales": {}, "identificativos": {}, "fuentes": [], "necesita_ocr": False}
     nif = args.nif or pre["identificativos"].get("nif") or ""
     razon = args.razon or pre["identificativos"].get("razon_social") or ""
@@ -224,6 +313,7 @@ def main():
                           "necesita_ocr": pre["necesita_ocr"], "n_caracteres": len(pre["caracteres"]),
                           "n_pagina01b": len(pre["pagina01b"]), "formales_grupos": [k for k, v in pre["formales"].items() if v],
                           "identificativos_poblados": {"nif": bool(nif), "razon": bool(razon)}}
+    estado.pop("cnae_fuente", None)
 
     # Paso 3 — Liquidacion FIRMADA (opcional; si no, export-base aplica la base cosmetica)
     liq = None
@@ -238,8 +328,8 @@ def main():
     # OPT-IN y fill-if-missing (lo que ya trae `merge_precarga` gana), con manifest HITL. Default None = no-op.
     _n1_200 = find(src_dir, PREV_200)
     _n1_pdf = [f for f in find(src_dir, PREV_PDF)
-               if any(k in os.path.basename(f).lower() for k in ("modelo 200", "modelo200", "justificante", "declaracion", "declaración"))
-               and not any(k in os.path.basename(f).lower() for k in ("cuentas", "annual", "datos fiscales", "informacion fiscal", "información fiscal"))]
+               if any(k in lname(f) for k in ("modelo 200", "modelo200", "justificante", "declaracion", "declaración"))
+               and not any(k in lname(f) for k in ("cuentas", "annual", "datos fiscales", "informacion fiscal", "información fiscal"))]
     precarga_n1 = (_n1_200 + _n1_pdf)[0] if (_n1_200 or _n1_pdf) else None
     # CCAA → APERTURA del ECPN (REDEVCO 2026-06-28): si el SyS no trae saldo de apertura, el motor proyecta el
     # ECPN desde el Balance de la CCAA (columna N-1) y la hoja reconcilia → la AEAT importa. Detecta la CCAA en
@@ -247,11 +337,17 @@ def main():
     # y PDF-portfolio/PDF. Si no hay CCAA o no hay capa de texto -> None (comportamiento previo).
     ecpn_ccaa_texto = None
     _ccaa = [f for f in find(src_dir, CCAA_EXTS)
-             if any(k in os.path.basename(f).lower() for k in ("ccaa", "cuentas anuales", "cuentas_anuales", "annual accounts"))]
+             if any(k in lname(f) for k in ("ccaa", "cuentas anuales", "cuentas_anuales", "annual accounts", "fy25 accounts"))]
     if _ccaa:
         try:
-            sys.path.insert(0, os.path.join(os.environ.get("CLAUDE_PLUGIN_ROOT", ""), "engine", "engine_service"))
-            import engines as _eng
+            repo_root = os.path.abspath(os.path.join(os.path.dirname(__file__), "../../../.."))
+            if repo_root not in sys.path:
+                sys.path.insert(0, repo_root)
+            try:
+                from engine_service import engines as _eng
+            except Exception:
+                sys.path.insert(0, os.path.join(os.environ.get("CLAUDE_PLUGIN_ROOT", ""), "engine", "engine_service"))
+                import engines as _eng
             _ccaa = sorted(_ccaa, key=lambda p: (0 if p.lower().endswith(".docx") else 1, p.lower()))
             ecpn_ccaa_texto = _eng.extraer_texto_ccaa(_ccaa[0]) or None
         except Exception as e:   # noqa: BLE001
@@ -261,7 +357,8 @@ def main():
                "caracteres": pre["caracteres"] or None, "pagina01b": pre["pagina01b"] or None,
                "formales": pre["formales"] or None, "liquidacion_provisional": liq or None,
                "precarga_n1": precarga_n1, "ecpn_ccaa_texto": ecpn_ccaa_texto,
-               "fuente_canonico": estado["fuenteCanonico"], "a3_confirmado": True}
+               "fuente_canonico": estado["fuenteCanonico"], "a3_confirmado": True,
+               "necesita_ocr": pre["necesita_ocr"]}
     res = post_json(args.engine, "/expediente/export-base", payload)
     estado["exportBase"] = {"ok": bool(res.get("ok")), "estado": res.get("estado"), "modo": ("asistida" if liq else "borrador"),
                             "generadoEn": now_iso(), "valido_xsd": (res.get("validacion") or {}).get("valido_xsd"),
@@ -276,7 +373,8 @@ def main():
     # Escribir entregables (codename) + canonico + manifiesto + estado
     fich = res.get("ficheros", {}) or {}
     nombres = {"declaracion_dr": f"{codename}_{ej}_modelo200.200", "xml_mod200": f"{codename}_{ej}_mod200.xml",
-               "estados_contables_aeat": f"{codename}_{ej}_estados_contables.xlsx", "agrupado_4d": f"{codename}_{ej}_agrupado_4d.xlsx"}
+               "estados_contables_aeat": f"{codename}_{ej}_estados_contables.xlsx", "agrupado_4d": f"{codename}_{ej}_agrupado_4d.xlsx",
+               "b1_post_import_json": "b1_participadas_post_import.json"}
     escritos = []
     for clave, nombre in nombres.items():
         m = fich.get(clave)

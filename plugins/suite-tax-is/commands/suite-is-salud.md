@@ -1,20 +1,19 @@
 ---
-description: Comprueba la salud del motor en produccion
+description: Comprueba salud y version del motor
 allowed-tools: Bash(curl:*)
 ---
 
-Comprueba la salud del **engine_service** (el motor fiscal canónico) en producción.
+Comprueba la salud y version del **engine_service** (el motor fiscal canónico).
 
-Ejecuta el health check documentado en `CLAUDE.md`:
+Para datos reales usa el motor local/IT, no el demo cloud:
 
 ```bash
-curl -s https://suite-is-engine-production.up.railway.app/salud
+curl -s http://127.0.0.1:8000/salud
+curl -s http://127.0.0.1:8000/version
 ```
 
-Esperado: `{"ok":true,"servicio":"engine_service",...}`. Reporta:
+Esperado: `ok:true` y `version >= 1.18.3` (o el umbral `SUITE_IS_MIN_ENGINE_VERSION`). Reporta:
 
-- **Verde** si responde `ok:true` (el motor está vivo; recuerda que producción es **DEMO** con datos
-  sintéticos — datos reales bloqueados por Auth+RLS, D18).
-- **Rojo** si no responde o devuelve error: indícalo y apunta a `DEPLOY.md` (causa raíz del healthcheck
-  PORT documentada ahí; no reintroducir `startCommand` en `railway.json`). No intentes "arreglarlo" por
-  otra vía sin el usuario.
+- **Verde** si responde `ok:true` y la version cumple el minimo.
+- **Rojo** si no responde, si `/version` no existe o si la version es antigua. En ese caso no generes
+  declaraciones: pide actualizar/reiniciar el servicio Windows, portable o `SUITE_IS_ENGINE_URL`.

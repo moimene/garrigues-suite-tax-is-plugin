@@ -8,7 +8,7 @@ description: >-
   correr un expediente por carpeta o procesar **muchas declaraciones en lote** para dejar de teclearlas a mano.
   Consume el motor por servicio (`/exportar-aeat`, ADR-001); el número lo firma el motor (fail-closed).
 metadata:
-  version: "1.7.0"
+  version: "1.8.0"
 ---
 
 # Suite IS — Export AEAT (.200 + XML) desde la contabilidad, 1 a 1 o en lote
@@ -62,8 +62,9 @@ Convierte la contabilidad (Sumas y Saldos) en la **base de importación a la AEA
    si no hay reparto 2025, el motor puede proponer proxy N-1 con `requiere_revision_humana`. En SOCIMI, el `.200`
    queda importable con cuota 0 cuando procede; modelos 217/237 quedan fuera del alcance del 200.
 
-## Una declaración (verifica primero la salud del motor)
-`curl -s http://127.0.0.1:8000/salud` → `{"ok":true,...}`. Luego:
+## Una declaración (verifica primero motor y version)
+`curl -s http://127.0.0.1:8000/salud` → `{"ok":true,...}` y
+`curl -s http://127.0.0.1:8000/version` → `version >= 1.18.3` (o `SUITE_IS_MIN_ENGINE_VERSION`). Luego:
 
 ```bash
 curl -s -X POST http://127.0.0.1:8000/exportar-aeat \
@@ -95,12 +96,14 @@ python3 ${CLAUDE_PLUGIN_ROOT}/skills/suite-is-export-aeat/scripts/lote_export_ae
   `<codename>_<ej>_estados_contables_aeat.xlsx`, `<codename>_<ej>_agrupado_4d.xlsx`,
   **`informe_lote.md`** (tabla por sociedad: ok / válido XSD / XLSX emitidos / provisional /
   liquidación / casillas dependientes a 0 / motivo) y `resumen.csv`.
+- El script hace health-check de `/salud` y `/version`; aborta si el motor no responde o si es anterior a
+  `1.18.3`.
 - **Excepciones = trabajo humano:** las sociedades con `ok:false` (SyS a revisar) o con casillas
   dependientes a cero. El resto queda lista para importar. Así "miles, manual" → "automático + HITL solo
-  en las excepciones". El script hace health-check del motor y aborta si no responde.
+  en las excepciones".
 
 ## Endpoints del motor que se usan
-`/salud` · `/exportar-aeat` (este) · `/ingesta-multi` (SyS + mayores con reconciliación inter-fichero,
+`/salud` · `/version` · `/exportar-aeat` (este) · `/ingesta-multi` (SyS + mayores con reconciliación inter-fichero,
 EPIC B/B5, si hay mayores) · `/campaigns` (versionado por ejercicio). El doble-check del número y la
 cadena de casillas: skill `suite-is-motor`.
 

@@ -30,11 +30,12 @@ fail-close y 0 PII.
    **locales y gitignored**; nombres en **codename**, nunca el NIF; no vuelques NIF/razón/importes en tu salida.
 5. **Push/PR y migraciones Supabase = humano.**
 
-**Primero:** salud del motor — `curl -s http://127.0.0.1:8000/salud` → `ok:true`. En Garrigues Windows
-Enterprise, si no responde, diagnostica con `suite-tax-is:arrancar-motor`: debe existir un servicio Windows
-local o una `SUITE_IS_ENGINE_URL` interna. El abogado **no** usa `make dev` (es solo para desarrollo del repo).
-Si falta el servicio, paras y escalas a IT; no intentes parchear la declaracion ni usar el motor demo cloud con
-datos reales.
+**Primero:** motor valido — `curl -s http://127.0.0.1:8000/salud` → `ok:true` y
+`curl -s http://127.0.0.1:8000/version` → `version >= 1.18.3`. En Garrigues Windows Enterprise, si no responde
+o es antiguo, diagnostica con `suite-tax-is:arrancar-motor`: debe existir un servicio Windows local o una
+`SUITE_IS_ENGINE_URL` interna actualizada. El abogado **no** usa `make dev` (es solo para desarrollo del repo).
+Si falta el servicio o esta desfasado, paras y escalas a IT; no intentes parchear la declaracion ni usar el
+motor demo cloud con datos reales.
 
 ## La carpeta del expediente (1 expediente = 1 carpeta)
 ```

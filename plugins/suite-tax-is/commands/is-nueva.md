@@ -6,10 +6,12 @@ Arranca el **stepper del Impuesto sobre Sociedades** para UN expediente, contra 
 **motor local** (`engine_service`, ADR-001). Delega la conducción en el agente **`is-stepper-orquestador`**.
 
 Pasos de arranque:
-1. **Salud del motor:** `curl -s http://127.0.0.1:8000/salud` → espera `{"ok":true,...}`. En Garrigues Windows
-   Enterprise, si no responde, ejecuta la skill `suite-tax-is:arrancar-motor` para diagnosticar: debe existir un
-   servicio Windows local o una `SUITE_IS_ENGINE_URL` interna. No uses `make dev` ni intentes instalar el motor
-   dentro del plugin thin. Si falta el servicio, para y pide arranque/configuración IT.
+1. **Motor valido:** `curl -s http://127.0.0.1:8000/salud` y `curl -s http://127.0.0.1:8000/version`.
+   Exige `ok:true` y `version >= 1.18.3` (o `SUITE_IS_MIN_ENGINE_VERSION`). En Garrigues Windows Enterprise,
+   si no responde o la version es antigua, ejecuta la skill `suite-tax-is:arrancar-motor` para diagnosticar:
+   debe existir un servicio Windows local o una `SUITE_IS_ENGINE_URL` interna actualizada. No uses `make dev` ni
+   intentes instalar el motor dentro del plugin thin. Si falta el servicio o esta desfasado, para y pide
+   arranque/actualizacion IT.
 2. **Identidad del expediente** (de `$ARGUMENTS` o pregúntala): **codename** + ejercicio + ruta de la carpeta.
    El NIF/razón reales son **solo locales** (nunca en tu salida); usa el codename para nombrar todo.
 3. **Estructura** (créala si no existe): `EXPEDIENTE_<codename>_<ejercicio>/{entrada,salida}/` + `estado.json`

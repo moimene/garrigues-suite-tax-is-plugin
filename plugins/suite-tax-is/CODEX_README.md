@@ -15,13 +15,15 @@ Instala o apunta Codex al marketplace del repo y selecciona `suite-tax-is`.
 
 ## Motor
 
-Codex no instala el motor. Antes de trabajar:
+Codex no instala el motor. Antes de trabajar comprueba salud y version:
 
 ```text
 http://127.0.0.1:8000/salud
+http://127.0.0.1:8000/version
 ```
 
-Si no responde, arranca el servicio Windows/portable o configura `SUITE_IS_ENGINE_URL`.
+Debe responder `ok:true` y `version >= 1.18.3`. Si no responde o el motor es antiguo, arranca/actualiza el
+servicio Windows/portable o configura `SUITE_IS_ENGINE_URL`.
 
 ## Uso
 

@@ -27,8 +27,8 @@ firmada/cosmética · no incluido) + la tabla de **casillas que dependen de otro
 ## El recorrido (6 pasos · 2 checkpoints)
 Lo conduce el agente **`is-stepper-orquestador`**; el comando **`/is-nueva`** lo arranca. Pipeline determinista
 en `scripts/expediente_carpeta.py`:
-1. **Salud** del motor (`/salud`) → en Garrigues Windows debe responder el servicio local
-   `127.0.0.1:8000` o una `SUITE_IS_ENGINE_URL` interna.
+1. **Motor valido** (`/salud` + `/version`) → en Garrigues Windows debe responder el servicio local
+   `127.0.0.1:8000` o una `SUITE_IS_ENGINE_URL` interna, con `version >= 1.18.3`.
 2. **Contabilidad**: `/fase-a-sys` (cuadre `00180=00252`) → `canonico_csv`. Descuadre → **fail-close**, para.
 3. **Precarga N-1 + datos fiscales 2025**: `/precarga-anterior` y dossier sobre `.200`/justificante/datos-fiscales
    → caracteres, página 1B, formales, identificativos (nif/razón) y bloque fiscal completo: retenciones/pagos
@@ -44,6 +44,7 @@ en `scripts/expediente_carpeta.py`:
 ## Uso
 ```bash
 curl -s http://127.0.0.1:8000/salud          # motor Windows local/servicio IT arriba
+curl -s http://127.0.0.1:8000/version        # version >= 1.18.3
 # Una carpeta (stepper por expediente):
 python3 ${CLAUDE_PLUGIN_ROOT}/skills/suite-is-export-aeat/scripts/expediente_carpeta.py \
   --carpeta /ruta/local/EXPEDIENTE_ACME_2025 --codename ACME --ejercicio 2025

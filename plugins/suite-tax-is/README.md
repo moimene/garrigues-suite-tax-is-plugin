@@ -7,10 +7,11 @@ importacion AEAT: `.200` DR200 + XML mod200. El motor debe estar arrancado en lo
 
 ## Version
 
-- Plugin: `1.18.1`
-- Motor minimo: `1.18.1`
-- Cambio clave: precarga N-1 formal completa de administradores, participadas B.1, socios B.2, titulares reales
-  y registros complementarios; el caracter `00027` no se arrastra porque depende del resultado de 2025.
+- Plugin: `1.18.3`
+- Motor minimo: `1.18.3`
+- Cambio clave: las skills verifican `/salud` y `/version` antes de generar declaraciones. Si el motor es antiguo
+  (por ejemplo un servicio Cowork/Windows no actualizado), el flujo aborta antes de producir `.200`. Se conserva la
+  consolidacion SUN/OpenWeb, B.1 selectivo, datos fiscales AEAT, secretario/titulares reales y pagina 26 foral.
 
 ## Requisitos antes de empezar
 
@@ -40,11 +41,15 @@ plugins/suite-tax-is/.codex-plugin/plugin.json
 
 ## Arrancar o comprobar el motor
 
-Comprueba salud:
+Comprueba salud y version:
 
 ```text
 http://127.0.0.1:8000/salud
+http://127.0.0.1:8000/version
 ```
+
+Debe responder `ok:true` y `version >= 1.18.3` salvo que IT configure otro umbral en
+`SUITE_IS_MIN_ENGINE_VERSION`.
 
 Opciones:
 
@@ -60,10 +65,13 @@ No uses motores demo o cloud con datos reales.
 
 ## Flujo de una declaracion
 
+Para abrir una conversacion nueva de fabrica, usa el prompt versionado:
+`prompts/activar-fabrica-declaraciones-v1.18.3.md`.
+
 1. Crear o localizar la carpeta del expediente.
 2. Incluir contabilidad, estados contables, `.200` N-1, datos fiscales y anexos disponibles.
 3. Ejecutar `/is-nueva` con la ruta del expediente.
-4. Revisar el intake: modelo de cuentas, N-1, CNAE, administradores, participadas, socios, titulares reales,
+4. Revisar el intake: modelo de cuentas, N-1, CNAE, administradores, participadas B.1 post-import, socios, titulares reales,
    datos fiscales, foralidad, regimenes especiales y anexos.
 5. Generar `.200` + XML.
 6. Leer el manifiesto de salida.

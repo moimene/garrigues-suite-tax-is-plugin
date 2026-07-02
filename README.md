@@ -47,7 +47,10 @@ El plugin no instala el motor. Antes de preparar declaraciones, el motor debe re
 
 ```text
 http://127.0.0.1:8000/salud
+http://127.0.0.1:8000/version
 ```
+
+Debe responder `ok:true` y `version >= 1.18.3`.
 
 Opciones:
 
@@ -62,12 +65,12 @@ Opciones:
 Artefactos esperados para la release actual:
 
 ```text
-downloads/motor/win64/suite-tax-is-portable-win64-v1.18.1.zip
-downloads/motor/win64/suite-tax-is-portable-win64-v1.18.1.zip.sha256
-downloads/motor/macos-arm64/suite-tax-is-portable-macos-arm64-v1.18.1.zip
-downloads/motor/macos-arm64/suite-tax-is-portable-macos-arm64-v1.18.1.zip.sha256
-downloads/motor/macos-x64/suite-tax-is-portable-macos-x64-v1.18.1.zip
-downloads/motor/macos-x64/suite-tax-is-portable-macos-x64-v1.18.1.zip.sha256
+downloads/motor/win64/suite-tax-is-portable-win64-v1.18.3.zip
+downloads/motor/win64/suite-tax-is-portable-win64-v1.18.3.zip.sha256
+downloads/motor/macos-arm64/suite-tax-is-portable-macos-arm64-v1.18.3.zip
+downloads/motor/macos-arm64/suite-tax-is-portable-macos-arm64-v1.18.3.zip.sha256
+downloads/motor/macos-x64/suite-tax-is-portable-macos-x64-v1.18.3.zip
+downloads/motor/macos-x64/suite-tax-is-portable-macos-x64-v1.18.3.zip.sha256
 ```
 
 Regla de tamano: si un zip supera el limite de GitHub para ficheros versionados en git, se publica como
@@ -91,4 +94,4 @@ OpenWeb sigue siendo el gate final de importabilidad.
 4. Ejecutar guardrail anti-PII.
 5. Commit, tag y push.
 
-Release actual: `1.18.1`.
+Release actual: `1.18.3`.

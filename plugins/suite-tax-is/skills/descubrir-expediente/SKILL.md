@@ -106,7 +106,7 @@ PDF best-effort) y **presenta al abogado un checklist por bloque** (captado / va
 | Modelo de cuentas / pág 1B | N-1 + CCAA | DP200001B | aviso; el abogado elige modelo de cuentas |
 | **Grupo fiscal** (si 00009/00010) — nº de grupo + NIF dominante | N-1 (pág 1: «Número de grupo fiscal» + «NIF de la entidad representante/dominante») | DP200001B campos 6 y 7 | **bloquea el miembro**: sin 00040 y NIF dominante, Open rechaza (10031, «00040 sin contenido»). Dependiente: campo 7 = NIF de la dominante (no el suyo) |
 | Administradores | N-1 | DP200002 campos 6-35 (hasta 5 slots) | aviso + pide |
-| **B.1 — sociedades en las que participa** | N-1 (bloque «Participaciones de la declarante») | DP200002 campos 36-99, con complementarias `C` si hay más de 3 | aviso + pide; vacío = «sociedades en las que participa» en blanco |
+| **B.1 — sociedades en las que participa** | N-1 (bloque «Participaciones de la declarante») | `.200` solo si es bloque simple (≤3 participadas completas, sin continuación). Si es complejo, **post-import/HITL** en `b1_participadas_post_import.json` | aviso + pide; tras import positivo, completar/revisar en Sociedades WEB si queda fuera |
 | B.2 — socios/partícipes de la declarante | N-1 | DP200002 campos 100-143, con complementarias `C` si hay más de 6 | aviso + pide |
 | Titular real / secretario / representantes | N-1 | DP200002B (titular 145-151, **sin 148**; titulares adicionales con complementarias `C`) | aviso + pide |
 | Contabilidad con **apertura N-1** (saldo inicial) | SyS (saldo inicial) o CCAA (columna N-1) | balance + ECPN (DP200009/10/11) | **solo en modelo NORMAL** bloquea el ECPN (sin apertura se rechaza E25400632/645). En **abreviado/PYMES el ECPN es VOLUNTARIO** → no bloquea ni exige apertura (el motor lo omite limpio: no emite 09/10/11 y declara campo15=0) |
@@ -116,7 +116,8 @@ PDF best-effort) y **presenta al abogado un checklist por bloque** (captado / va
 1. Ejecuta el inventario y, si hay N-1, **precarga y muestra el checklist por bloque** (captado/vacío).
 2. Para cada bloque esencial **vacío**, pregunta al abogado: ¿aporta el `.200` N-1 (arrastre determinista) o lo
    confirma/completa en Sociedades WEB? Si el N-1 es **PDF**, advierte que la extracción es *best-effort* y que
-   caracteres y B.1 deben **confirmarse** aunque salgan poblados.
+   caracteres y B.1 deben **confirmarse** aunque salgan poblados. B.1 complejo no viaja dentro del `.200`
+   importable: viaja como artefacto local post-import para evitar FRECH por `01501/01502/01503`.
 3. Reitera hasta que el abogado dé por **completo** el intake de esa sociedad. Solo entonces continúa al motor.
 4. Todo bloque arrastrado del N-1 viaja con **aviso HITL** («revisión del abogado OBLIGATORIA»): el motor *se
    nutre* del N-1 pero **no decide identidad/configuración** por su cuenta.

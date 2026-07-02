@@ -1,7 +1,7 @@
 {
   "name": "suite-tax-is",
-  "version": "1.18.1",
-  "description": "Suite Tax IS - copiloto del Impuesto sobre Sociedades (Modelos 200/202/222) de Garrigues sobre el motor fiscal Python canonico (ADR-001), que firma el numero. Genera la BASE DE IMPORTACION AEAT (DR200 + XML mod200 contra XSD) desde contabilidad, Balance/PyG formulado o expediente por carpeta, 1 a 1 o en lote. Release 1.18.1 consolida importabilidad OpenWeb y corrige la precarga N-1 formal: administradores completos, participadas B.1 y socios B.2 con registros complementarios, titulares reales adicionales y caracter 00027 no arrastrado por ser volatil. El paquete thin excluye expedientes reales y salidas con PII.",
+  "version": "1.18.3",
+  "description": "Suite Tax IS - copiloto del Impuesto sobre Sociedades (Modelos 200/202/222) de Garrigues sobre el motor fiscal Python canonico (ADR-001), que firma el numero. Genera la BASE DE IMPORTACION AEAT (DR200 + XML mod200 contra XSD) desde contabilidad, Balance/PyG formulado o expediente por carpeta, 1 a 1 o en lote. Release 1.18.3 consolida el guardrail de version del motor, poda abreviado/PYMES reforzada y memoria de errores OpenWeb. El paquete thin excluye expedientes reales y salidas con PII.",
   "author": {
     "name": "Garrigues - Suite Fiscal Enterprise"
   },

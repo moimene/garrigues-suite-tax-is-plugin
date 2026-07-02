@@ -6,7 +6,7 @@ description: >-
   normal/abreviado/PYMES, ECPN, gastos financieros, tributación foral, SOCIMI, precarga N-1, datos fiscales y
   validación de importabilidad. El motor firma el número; el plugin solo lo orquesta.
 metadata:
-  version: "1.18.1"
+  version: "1.18.3"
 ---
 
 # Suite IS — motor fiscal
@@ -14,16 +14,22 @@ metadata:
 El motor fiscal Python es la fuente canónica de cálculo y emisión. El plugin no calcula casillas por su cuenta:
 prepara el expediente, llama al motor, muestra el manifiesto y ayuda a iterar errores de importación.
 
-## Release 1.18.1
+## Release 1.18.3
 
 - Perfiles contables `normal`, `abreviado` y `pymes`.
 - ECPN coherente con saldos de balance N/N-1 cuando procede.
 - Página 20 de gastos financieros y casillas calculadas por OpenWeb.
 - Tributación foral con página 26 obligatoria y proxy N-1 marcado como revisión humana.
 - SOCIMI con cuota 0 del Modelo 200 cuando procede.
-- Precarga N-1 formal completa: administradores, B.1/B.2 con complementarias, titulares reales adicionales.
+- Precarga N-1 formal completa: administradores, B.2 con complementarias y titulares reales adicionales. B.1 se
+  emite solo si es simple; si requiere continuación queda como artefacto post-import (`b1_participadas_post_import.json`).
 - Carácter `00027` no arrastrado por depender del resultado fiscal del ejercicio.
 - Datos fiscales AEAT como intake HITL.
+- SUN/OpenWeb: B.1 simple se emite en el `.200`; B.1 complejo con continuaciones queda en
+  `b1_participadas_post_import.json`.
+- Secretario/titulares reales desde Datos Fiscales AEAT y página 26 foral reforzados.
+- Guardrail operativo de version: las skills y scripts abortan si `/version < 1.18.3`.
+- Abreviado/PYMES: refuerzo de poda de partidas normal-only en PyG para evitar rechazos OpenWeb como `00705`.
 
 Sociedades WEB/OpenWeb sigue siendo el gate final de importabilidad.
 
@@ -33,6 +39,7 @@ Motor local esperado:
 
 ```text
 http://127.0.0.1:8000/salud
+http://127.0.0.1:8000/version
 ```
 
 En Windows Enterprise puede existir una URL interna en `SUITE_IS_ENGINE_URL`. No uses motores demo con datos
@@ -41,6 +48,7 @@ reales.
 ## Endpoints habituales
 
 - `/salud`: disponibilidad del servicio.
+- `/version`: version semantica; las skills exigen `>= 1.18.3` salvo override `SUITE_IS_MIN_ENGINE_VERSION`.
 - `/precarga-anterior`: lectura de `.200` N-1 y datos formales recurrentes.
 - `/resolver-contable` / `/fase-a-sys`: normalización contable.
 - `/liquidar-orquestado`: liquidación firmada.

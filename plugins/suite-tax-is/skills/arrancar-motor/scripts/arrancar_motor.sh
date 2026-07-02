@@ -18,6 +18,7 @@ ENGINE="$PLUGIN_ROOT/engine"
 WHEELS="$ENGINE/vendor/wheels"
 REQ="$ENGINE/vendor/requirements-runtime.txt"
 PY="${PYTHON:-python3}"
+MIN_VERSION="${SUITE_IS_MIN_ENGINE_VERSION:-1.18.3}"
 
 ping() {  # ping <base-url> -> "up"/"down"
   "$PY" - "$1" <<'PY' 2>/dev/null
@@ -27,6 +28,36 @@ try:
     print("up" if ok else "down")
 except Exception:
     print("down")
+PY
+}
+
+version_guard() {  # version_guard <base-url> -> exit 0 si /salud ok y /version >= MIN_VERSION
+  "$PY" - "$1" "$MIN_VERSION" <<'PY' 2>/dev/null
+import json
+import re
+import sys
+import urllib.request
+
+base = sys.argv[1].rstrip("/")
+min_version = sys.argv[2]
+
+
+def vt(value):
+    parts = [int(x) for x in re.findall(r"\d+", str(value or ""))[:3]]
+    return tuple((parts + [0, 0, 0])[:3])
+
+
+try:
+    salud = json.load(urllib.request.urlopen(base + "/salud", timeout=5))
+    info = json.load(urllib.request.urlopen(base + "/version", timeout=5))
+    actual = str(info.get("version") or "")
+    if salud.get("ok") is True and vt(actual) >= vt(min_version):
+        print(actual)
+        raise SystemExit(0)
+    print(actual or "?")
+except Exception:
+    print("?")
+raise SystemExit(1)
 PY
 }
 
@@ -40,12 +71,26 @@ PY
 }
 
 # 0) ¿ya arriba?
-if [ "$(ping "$BASE")" = "up" ]; then echo "✓ motor ya operativo en $BASE"; exit 0; fi
+if VERSION_OK="$(version_guard "$BASE")"; then
+  echo "✓ motor ya operativo en $BASE (version $VERSION_OK)"
+  exit 0
+fi
+if [ "$(ping "$BASE")" = "up" ]; then
+  echo "ERROR: hay un motor respondiendo en $BASE, pero su version es $VERSION_OK y se requiere >= $MIN_VERSION."
+  echo "Actualiza/reinicia el servicio antes de generar declaraciones."
+  exit 1
+fi
 
 # 1) ¿motor remoto provisto por IT? (no se instala nada en local)
 if [ -n "${SUITE_IS_ENGINE_URL:-}" ]; then
+  if VERSION_OK="$(version_guard "$SUITE_IS_ENGINE_URL")"; then
+    echo "✓ usando motor remoto en $SUITE_IS_ENGINE_URL (version $VERSION_OK, SUITE_IS_ENGINE_URL)"
+    exit 0
+  fi
   if [ "$(ping "$SUITE_IS_ENGINE_URL")" = "up" ]; then
-    echo "✓ usando motor remoto en $SUITE_IS_ENGINE_URL (SUITE_IS_ENGINE_URL)"; exit 0
+    echo "ERROR: SUITE_IS_ENGINE_URL=$SUITE_IS_ENGINE_URL responde, pero su version es $VERSION_OK y se requiere >= $MIN_VERSION."
+    echo "No uso un motor remoto antiguo con datos reales."
+    exit 1
   fi
   echo "AVISO: SUITE_IS_ENGINE_URL=$SUITE_IS_ENGINE_URL no responde; intento arrancar el motor local."
 fi
@@ -83,7 +128,10 @@ echo "→ Arrancando el motor en $BASE …"
 ( cd "$ENGINE" && nohup "$PY" -m uvicorn engine_service.app:app --host 127.0.0.1 --port "$PORT" >/tmp/suite_is_motor.log 2>&1 & )
 for _ in $(seq 1 45); do
   sleep 1
-  if [ "$(ping "$BASE")" = "up" ]; then echo "✓ motor OK en $BASE"; exit 0; fi
+  if VERSION_OK="$(version_guard "$BASE")"; then
+    echo "✓ motor OK en $BASE (version $VERSION_OK)"
+    exit 0
+  fi
 done
 echo "ERROR: el motor no respondió en 45s. Revisa /tmp/suite_is_motor.log"; tail -5 /tmp/suite_is_motor.log 2>/dev/null
 exit 1

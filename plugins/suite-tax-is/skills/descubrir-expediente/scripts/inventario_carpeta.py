@@ -8,14 +8,18 @@ ES/EN, multipestaña) y devuelve un manifiesto de intake para iterar con el usua
 Uso:  python3 inventario_carpeta.py "<ruta-de-la-carpeta>"
 PII:  los nombres de fichero son locales; en el chat resume en CODENAME, sin NIF/importes.
 """
-import sys, os, json, glob, re
+import sys, os, json, glob, re, unicodedata
 
 SYS_EXT = (".xlsx", ".xls", ".csv")
 
 
+def _norm_text(s):
+    return unicodedata.normalize("NFC", str(s or "")).lower()
+
+
 def _kw(name, *ks):
-    n = name.lower()
-    return any(k in n for k in ks)
+    n = _norm_text(name)
+    return any(_norm_text(k) in n for k in ks)
 
 
 def _rel(folder, path):
@@ -148,7 +152,8 @@ def scan(folder):
         elif ext == ".pdf" and _kw(b, "modelo 200", "modelo200", "justificante", "autoliquid", "declaracion"):
             roles["modelo200_pdf"].append(b)
             paths["modelo200_pdf"].append(_rel(folder, p))
-        elif ext == ".pdf" and _kw(b, "cuentas anuales", "ccaa", "cuentas_anuales", "memoria"):
+        elif ext == ".pdf" and _kw(b, "cuentas anuales", "ccaa", "cuentas_anuales", "memoria",
+                                   "annual accounts", "fy25 accounts"):
             roles["ccaa"].append(b)
             paths["ccaa"].append(_rel(folder, p))
         elif ext in SYS_EXT:

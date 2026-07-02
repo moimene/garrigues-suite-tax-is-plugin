@@ -22,9 +22,10 @@ Uso:
     map.csv (UTF-8, ';'): fichero;codename;nif;razon_social;liquidacion
       - fichero = nombre del SyS (basename)         - liquidacion = ruta a un JSON {casilla: importe} del cierre firmado (opcional)
 """
-import argparse, base64, csv, glob, json, mimetypes, os, sys, urllib.parse, urllib.request, urllib.error, uuid
+import argparse, base64, csv, glob, json, mimetypes, os, re, sys, urllib.parse, urllib.request, urllib.error, uuid
 
 EXTS = (".xls", ".xlsx", ".csv")
+MIN_ENGINE_VERSION = os.environ.get("SUITE_IS_MIN_ENGINE_VERSION", "1.18.3")
 
 
 def post_multipart(url, fields, file_field, file_path, timeout=180):
@@ -51,6 +52,31 @@ def salud(engine):
             return json.loads(r.read().decode("utf-8")).get("ok") is True
     except Exception:
         return False
+
+
+def _get_json(url, timeout=15):
+    with urllib.request.urlopen(url, timeout=timeout) as r:
+        return json.loads(r.read().decode("utf-8"))
+
+
+def _version_tuple(value):
+    parts = [int(x) for x in re.findall(r"\d+", str(value or ""))[:3]]
+    return tuple((parts + [0, 0, 0])[:3])
+
+
+def comprobar_motor(engine):
+    base = engine.rstrip("/")
+    try:
+        estado = _get_json(base + "/salud")
+        info = _get_json(base + "/version")
+    except Exception as exc:
+        return False, f"no responde: {type(exc).__name__}: {exc}"
+    if estado.get("ok") is not True:
+        return False, f"/salud no OK: {estado}"
+    actual = str(info.get("version") or "")
+    if _version_tuple(actual) < _version_tuple(MIN_ENGINE_VERSION):
+        return False, f"version antigua {actual or '?'}; requiere >= {MIN_ENGINE_VERSION}"
+    return True, f"version {actual}"
 
 
 def safe_codename(s):
@@ -103,9 +129,10 @@ def main():
               "el cloud demo es para datos sinteticos.",
               file=sys.stderr)
 
-    if not salud(args.engine):
-        sys.exit(f"ERROR: el engine no responde en {args.engine}/salud. Arranca el servicio Windows local "
-                 "o configura SUITE_IS_ENGINE_URL y reintenta.")
+    motor_ok, motor_msg = comprobar_motor(args.engine)
+    if not motor_ok:
+        sys.exit(f"ERROR: motor no valido en {args.engine}: {motor_msg}. Arranca/actualiza el servicio Windows "
+                 "local, configura SUITE_IS_ENGINE_URL o usa el portable correcto.")
 
     mp = load_map(args.map)
     ficheros = sorted(f for f in glob.glob(os.path.join(args.carpeta, "**", "*"), recursive=True)
